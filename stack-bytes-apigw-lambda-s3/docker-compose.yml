@@ -5,7 +5,7 @@ services:
     networks:
       - ls_network
     container_name: localstack
-    image: localstack/localstack-pro:2.2.0
+    image: localstack/localstack-pro:latest
     ports:
       - "127.0.0.1:4566:4566"            # LocalStack Gateway
       - "127.0.0.1:4510-4559:4510-4559"  # external services port range
@@ -16,7 +16,7 @@ services:
       - ENFORCE_IAM=0 # enforce IAM policies
       - LAMBDA_DOCKER_NETWORK=ls_network
 
-      - LOCALSTACK_API_KEY=<YOUR_API_KEY>
+      - LOCALSTACK_API_KEY=<YOUR API KEY>
 
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
