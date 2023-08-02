@@ -29,3 +29,11 @@ serverless capabilities to manage the application's backend logic seamlessly.
 - [Maven 3.8.5](https://maven.apache.org/install.html) & [Java 17](https://www.java.com/en/download/help/download_options.html)
 - [LocalStack](https://localstack.cloud/)
 - [Docker](https://docs.docker.com/get-docker/) - for running LocalStack
+
+## Before starting
+
+Make sure to build the Lambda function by running the following command in the `stack-bytes-apigw-lambda-s3` folder
+
+```
+mvn clean package shade:shade
+```

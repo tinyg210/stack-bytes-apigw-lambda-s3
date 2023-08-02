@@ -16,7 +16,7 @@ services:
       - ENFORCE_IAM=0 # enforce IAM policies
       - LAMBDA_DOCKER_NETWORK=ls_network
 
-      - LOCALSTACK_API_KEY=<YOUR API KEY>
+      - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY}
 
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
