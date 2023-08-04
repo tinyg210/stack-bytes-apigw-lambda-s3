@@ -47,10 +47,7 @@ jobs:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
         run: |
           docker-compose up -d
-          # Wait 20 seconds for the LocalStack container to become ready before timing out
-          echo "Waiting for LocalStack startup..."
-          localstack wait -t 20
-          echo "LocalStack startup complete"
+          sleep 20
           
       - name: Check for Bucket
         run: |
