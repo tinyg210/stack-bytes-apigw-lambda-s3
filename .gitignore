@@ -1,0 +1,9 @@
+/.idea/
+/stack-bytes-apigw-lambda-s3/.idea/
+/stack-bytes-lambda/volume/
+
+/stack-bytes-apigw-lambda-s3/stack-bytes-init-hooks-lambda.iml
+/stack-bytes-lambda/stack-bytes-lambda.iml
+/stack-bytes-sdk/stack-bytes-sdk.iml
+/stack-bytes-sdk/target/
+/stack-bytes-lambda/target/

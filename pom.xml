@@ -9,8 +9,9 @@
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
   <modules>
-    <module>stack-bytes-apigw-lambda-s3</module>
+    <module>stack-bytes-lambda</module>
     <module>stack-bytes-sdk</module>
+    <module>github-actions</module>
   </modules>
 
   <properties>

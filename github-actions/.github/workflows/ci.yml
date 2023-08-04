@@ -1,0 +1,46 @@
+name: Environment Setup
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  setup-infra:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Maven
+        run: sudo apt-get install -y maven
+
+      - name: Build Lambdas
+        run: |
+          cd stack-bytes-lambda
+          mvn clean package shade:shade
+
+      - name: Set up Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Build and start infrastructure
+        run: |
+          docker-compose -f github-actions/docker-compose.yml up -d
+          
+      - name: Check for Bucket
+        run: |
+          output=$(awslocal s3api list-buckets --query "Buckets[?contains(Name, 'quotes')].Name" --output text)
+          if [ -z "$output" ]; then
+            echo "Created bucket not found."
+            exit 1
+          else echo "Bucket with <quotes> name was found: $output"
+          fi
