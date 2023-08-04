@@ -34,7 +34,7 @@ jobs:
 
       - name: Build and start infrastructure
         run: |
-          docker-compose -f github-actions/docker-compose.yml up -d
+          docker-compose up -d
           
       - name: Check for Bucket
         run: |
