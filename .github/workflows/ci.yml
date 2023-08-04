@@ -60,11 +60,11 @@ jobs:
       - name: Generate a Diagnostic Report
         if: failure()
         run: |
-          curl -s localhost:4566/_localstack/diagnose | gzip -cf > diagnose.json.gz
+          curl -s localhost:4566/_localstack/diagnose > diagnose.json
 
       - name: Upload the Diagnostic Report
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: diagnose.json.gz
-          path: ./diagnose.json.gz
+          name: diagnose.json
+          path: ./diagnose.json
