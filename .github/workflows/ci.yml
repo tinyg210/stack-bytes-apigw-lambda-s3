@@ -33,6 +33,8 @@ jobs:
           sudo apt-get install -y docker-compose
 
       - name: Build and start infrastructure
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
         run: |
           docker-compose up -d
           
