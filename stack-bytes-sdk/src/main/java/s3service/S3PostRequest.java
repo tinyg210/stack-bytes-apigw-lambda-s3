@@ -14,7 +14,7 @@ public class S3PostRequest {
   public static void main(String[] args) {
 
     // local file to upload
-    String filePath = "stack-bytes-sdk/src/main/resources/Fiona.txt";
+    String filePath = "src/main/resources/Fiona.txt";
     String objectKey = "Fiona.txt";
 
     try {

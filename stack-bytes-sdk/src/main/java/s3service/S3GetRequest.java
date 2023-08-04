@@ -17,7 +17,7 @@ public class S3GetRequest {
 
   public static void main(String[] args) {
 
-    String objectKey = "Shrek.txt";
+    String objectKey = "Fiona.txt";
 
     try {
       // get the object from the S3 bucket
