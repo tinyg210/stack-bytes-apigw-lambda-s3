@@ -19,6 +19,16 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install awslocal
+        run: |
+          pip install awscli-local
+
+
       - name: Set up Maven
         run: sudo apt-get install -y maven
 
