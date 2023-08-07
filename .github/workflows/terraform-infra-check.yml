@@ -1,0 +1,109 @@
+name: Create Infra on LocalStack
+
+on:
+  push:
+    paths-ignore:
+      - 'README.md'
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  infrastructure-check:
+    name: Setup infrastructure using Terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Maven
+        run: sudo apt-get install -y maven
+
+      - name: Install LocalStack & awslocal
+        run: |
+          pip install localstack
+          pip install terraform-local
+          pip install awscli-local
+
+      - name: Build Lambda
+        run: |
+          cd stack-bytes-lambda
+          mvn clean package shade:shade
+
+      - name: Start LocalStack
+        env:
+          LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
+        run: |
+          docker pull localstack/localstack-pro:latest
+          # Start LocalStack in the background
+          LS_LOG=trace localstack start -d
+          # Wait 20 seconds for the LocalStack container to become ready before timing out
+          echo "Waiting for LocalStack startup..."
+          localstack wait -t 20
+          echo "Startup complete"
+
+      - name: Run Terraform Config File
+        run: |
+          cd github-actions-infra/terraform
+          bash run-terraform.sh
+
+      - name: Check for Bucket
+          run: |
+            output=$(awslocal s3api list-buckets --query "Buckets[?contains(Name, 'quotes')].Name" --output text)
+            if [ -z "$output" ]; then
+            echo "Created bucket not found."
+            exit 1
+            else echo "Bucket with <quotes> name was found: $output"
+            fi
+
+      - name: Check for GET Lambda
+          run: |
+            getlambda_output=$(awslocal lambda get-function --function-name 'get-quote')
+            if [ -z "getlambda_output" ]; then
+              echo "Lambda function not found."
+              exit 1
+            else echo "Lambda function was created: getlambda_output"
+            fi
+
+      - name: Check for POST Lambda
+          run: |
+          postlambda_output=$(awslocal lambda get-function --function-name 'create-quote')
+          if [ -z "postlambda_output" ]; then
+          echo "Lambda function not found."
+          exit 1
+          else echo "Lambda function was created: postlambda_output"
+          fi
+
+      - name: Check API Gateway
+          run: |
+            apigw_output=$(awslocal apigateway get-rest-apis --query "items[?name=='quote-api-gateway']")
+            if [ -z "apigw_output" ]; then
+              echo "API Gateway function not found."
+              exit 1
+            else echo "API Gateway was created: apigw_output"
+            fi
+
+      - name: Generate a Diagnostic Report
+          if: failure()
+          run: |
+            curl -s localhost:4566/_localstack/diagnose > diagnose.json
+
+      - name: Upload the Diagnostic Report
+          if: failure()
+          uses: actions/upload-artifact@v3
+          with:
+            name: diagnose.json
+            path: ./diagnose.json

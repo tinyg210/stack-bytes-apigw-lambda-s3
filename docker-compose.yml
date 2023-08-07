@@ -21,8 +21,8 @@ services:
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "./stack-bytes-lambda/target/apigw-lambda.jar:/etc/localstack/init/ready.d/target/apigw-lambda.jar"
-      - "./init-resources.sh:/etc/localstack/init/ready.d/init-resources.sh"
+#      - "./stack-bytes-lambda/target/apigw-lambda.jar:/etc/localstack/init/ready.d/target/apigw-lambda.jar"
+#      - "./init-resources.sh:/etc/localstack/init/ready.d/init-resources.sh"
 
 networks:
   ls_network:
