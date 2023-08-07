@@ -59,7 +59,7 @@ jobs:
 
       - name: Check for GET Lambda
         run: |
-          getlambda_output=$(awslocal lambda get-function --function-name 'get-lambda')
+          getlambda_output=$(awslocal lambda get-function --function-name 'get-quote')
           if [ -z "getlambda_output" ]; then
             echo "Lambda function not found."
             exit 1
@@ -68,7 +68,7 @@ jobs:
 
       - name: Check for POST Lambda
         run: |
-          postlambda_output=$(awslocal lambda get-function --function-name 'create-lambda')
+          postlambda_output=$(awslocal lambda get-function --function-name 'create-quote')
           if [ -z "postlambda_output" ]; then
             echo "Lambda function not found."
             exit 1
