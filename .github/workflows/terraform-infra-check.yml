@@ -6,9 +6,6 @@ on:
       - 'README.md'
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   infrastructure-check:
