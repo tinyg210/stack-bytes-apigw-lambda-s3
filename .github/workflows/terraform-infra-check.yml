@@ -58,49 +58,49 @@ jobs:
           bash run-terraform.sh
 
       - name: Check for Bucket
-          run: |
-            output=$(awslocal s3api list-buckets --query "Buckets[?contains(Name, 'quotes')].Name" --output text)
-            if [ -z "$output" ]; then
-            echo "Created bucket not found."
-            exit 1
-            else echo "Bucket with <quotes> name was found: $output"
-            fi
-
-      - name: Check for GET Lambda
-          run: |
-            getlambda_output=$(awslocal lambda get-function --function-name 'get-quote')
-            if [ -z "getlambda_output" ]; then
-              echo "Lambda function not found."
-              exit 1
-            else echo "Lambda function was created: getlambda_output"
-            fi
-
-      - name: Check for POST Lambda
-          run: |
-          postlambda_output=$(awslocal lambda get-function --function-name 'create-quote')
-          if [ -z "postlambda_output" ]; then
-          echo "Lambda function not found."
+        run: |
+          output=$(awslocal s3api list-buckets --query "Buckets[?contains(Name, 'quotes')].Name" --output text)
+          if [ -z "$output" ]; then
+          echo "Created bucket not found."
           exit 1
-          else echo "Lambda function was created: postlambda_output"
+          else echo "Bucket with <quotes> name was found: $output"
           fi
 
+      - name: Check for GET Lambda
+        run: |
+          getlambda_output=$(awslocal lambda get-function --function-name 'get-quote')
+          if [ -z "getlambda_output" ]; then
+          echo "Lambda function not found."
+          exit 1
+          else echo "Lambda function was created: getlambda_output"
+          fi
+
+      - name: Check for POST Lambda
+        run: |
+        postlambda_output=$(awslocal lambda get-function --function-name 'create-quote')
+        if [ -z "postlambda_output" ]; then
+        echo "Lambda function not found."
+        exit 1
+        else echo "Lambda function was created: postlambda_output"
+        fi
+
       - name: Check API Gateway
-          run: |
-            apigw_output=$(awslocal apigateway get-rest-apis --query "items[?name=='quote-api-gateway']")
-            if [ -z "apigw_output" ]; then
-              echo "API Gateway function not found."
-              exit 1
-            else echo "API Gateway was created: apigw_output"
-            fi
+        run: |
+          apigw_output=$(awslocal apigateway get-rest-apis --query "items[?name=='quote-api-gateway']")
+          if [ -z "apigw_output" ]; then
+          echo "API Gateway function not found."
+          exit 1
+          else echo "API Gateway was created: apigw_output"
+          fi
 
       - name: Generate a Diagnostic Report
-          if: failure()
-          run: |
-            curl -s localhost:4566/_localstack/diagnose > diagnose.json
+        if: failure()
+        run: |
+          curl -s localhost:4566/_localstack/diagnose > diagnose.json
 
       - name: Upload the Diagnostic Report
-          if: failure()
-          uses: actions/upload-artifact@v3
-          with:
-            name: diagnose.json
-            path: ./diagnose.json
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: diagnose.json
+          path: ./diagnose.json
