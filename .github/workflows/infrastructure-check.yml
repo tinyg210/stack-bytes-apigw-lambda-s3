@@ -46,7 +46,7 @@ jobs:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
         run: |
           docker-compose up -d
-          sleep 20
+          sleep 30
           
       - name: Check for Bucket
         run: |
