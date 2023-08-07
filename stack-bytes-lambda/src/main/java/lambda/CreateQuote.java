@@ -33,9 +33,8 @@ public class CreateQuote extends QuoteApi implements RequestStreamHandler {
 
       }
 
-    } catch (ParseException parseException) {
-      responseJson.put("statusCode", 400);
-      responseJson.put("exception", parseException);
+    } catch (ParseException | BusinessException exception) {
+      create400Response(responseJson, exception);
     }
 
     OutputStreamWriter writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
@@ -46,7 +45,7 @@ public class CreateQuote extends QuoteApi implements RequestStreamHandler {
   private void create200Response(JSONObject responseJson, Quote quote) {
     JSONObject responseBody = new JSONObject();
     responseBody.put("message", "New file has been added.");
-    responseBody.put("quote", quote.toString());
+    responseBody.put("savedText", quote.toString());
 
     JSONObject headerJson = new JSONObject();
 
@@ -55,10 +54,30 @@ public class CreateQuote extends QuoteApi implements RequestStreamHandler {
     responseJson.put("body", responseBody.toString());
   }
 
+  private void create400Response(JSONObject responseJson, Exception exception) {
+    JSONObject responseBody = new JSONObject();
+    responseBody.put("message", "Exception occurred.");
+    responseBody.put("exception", exception.getMessage());
 
-  private void addQuoteFileToS3(Quote input) {
+    JSONObject headerJson = new JSONObject();
+
+    responseJson.put("statusCode", 400);
+    responseJson.put("headers", headerJson);
+    responseJson.put("body", responseBody.toString());
+
+  }
+
+
+  private void addQuoteFileToS3(Quote input) throws BusinessException {
     String author = input.getAuthor();
     String text = input.getText();
+
+    if(author == null) {
+      throw new BusinessException("The following field cannot be empty: author.");
+    }
+    if(text == null) {
+      throw new BusinessException("The following field cannot be empty: text.");
+    }
 
     // create content and file name
     String fileContent = "Author: " + author + "\n" + "Quote: " + text;

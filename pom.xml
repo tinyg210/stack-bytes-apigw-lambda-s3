@@ -11,7 +11,7 @@
   <modules>
     <module>stack-bytes-lambda</module>
     <module>stack-bytes-sdk</module>
-    <module>github-actions</module>
+    <module>github-actions-tests</module>
   </modules>
 
   <properties>

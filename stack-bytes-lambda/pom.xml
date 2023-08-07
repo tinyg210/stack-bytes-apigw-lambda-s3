@@ -87,6 +87,29 @@
           </execution>
         </executions>
       </plugin>
+
+<!--      plugin to execute code update in the lambda at build time-->
+<!--      <plugin>-->
+<!--        <groupId>org.codehaus.mojo</groupId>-->
+<!--        <artifactId>exec-maven-plugin</artifactId>-->
+<!--        <version>3.0.0</version>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <id>run-reload-script</id>-->
+<!--            <phase>package</phase>-->
+<!--            <goals>-->
+<!--              <goal>exec</goal>-->
+<!--            </goals>-->
+<!--            <configuration>-->
+<!--              <executable>bash</executable>-->
+<!--              <arguments>-->
+<!--                <argument>src/main/resources/lambda_update_script.sh</argument>-->
+<!--              </arguments>-->
+<!--            </configuration>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
+
     </plugins>
   </build>
 </project>
