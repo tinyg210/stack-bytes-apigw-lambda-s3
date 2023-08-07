@@ -1,4 +1,4 @@
-name: Create Infra on LocalStack
+name: Create and Verify Infrastructure on LocalStack
 on:
   push:
     paths-ignore:
