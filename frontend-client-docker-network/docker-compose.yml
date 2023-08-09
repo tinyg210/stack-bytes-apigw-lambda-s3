@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  localstack:
+    networks:
+      - ls_network
+    container_name: localstack
+    image: localstack/localstack-pro:latest
+    environment:
+      - DEBUG=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - LOCALSTACK_HOST=localstack
+      - ENFORCE_IAM=0
+      - LAMBDA_DOCKER_NETWORK=ls_network
+
+      - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY}
+
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "../stack-bytes-lambda/target/apigw-lambda.jar:/etc/localstack/init/ready.d/target/apigw-lambda.jar"
+      - "../init-resources.sh:/etc/localstack/init/ready.d/init-resources.sh"
+
+  frontend:
+    networks:
+      - ls_network
+    container_name: frontend
+    image: frontend
+    ports:
+     - "8080:8080"
+    volumes:
+      - ./frontend:/app
+
+networks:
+  ls_network:
+    name: ls_network
