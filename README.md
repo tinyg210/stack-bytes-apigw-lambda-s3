@@ -22,7 +22,7 @@ Gateway invokes a separate Lambda function that retrieves the Quotes from the S3
 name. This architecture ensures efficient and scalable handling of Quotes while leveraging AWS Lambda's 
 serverless capabilities to manage the application's backend logic seamlessly.
 
-![api-gw-lambda](stack-bytes-apigw-lambda-s3/api-gw-lambda.png)
+![api-gw-lambda](api-gw-lambda.png)
 
 ## Prerequisites
 
