@@ -17,8 +17,9 @@ public class LocalStackConfig {
 
   @Container
   protected static LocalStackContainer localStack =
-      new LocalStackContainer(DockerImageName.parse("localstack/localstack:2.2.0"))
+      new LocalStackContainer(DockerImageName.parse("localstack/localstack-pro:2.2.0"))
           .withEnv("LAMBDA_REMOVE_CONTAINERS", "1")
+          .withEnv("LOCALSTACK_API_KEY", System.getenv("LOCALSTACK_API_KEY"))
           .withFileSystemBind("../stack-bytes-lambda/target/apigw-lambda.jar",
               "/etc/localstack/init/ready.d/target/apigw-lambda.jar")
           .withFileSystemBind("src/test/resources/init-resources.sh",
