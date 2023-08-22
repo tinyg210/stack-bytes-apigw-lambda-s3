@@ -27,6 +27,13 @@ public class QuoteAppTests extends LocalStackConfig {
   public static void setup() {
     setupConfig();
     localStack.followOutput(logConsumer);
+    // wait 5 seconds to make sure the lambda is active
+    try {
+      Thread.sleep(5000);
+
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
   }
 
   @AfterAll
