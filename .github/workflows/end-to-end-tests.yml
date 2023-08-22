@@ -1,0 +1,47 @@
+name: Testcontainers End-to-End Testing
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  setup-infra:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install awslocal
+        run: |
+          pip install awscli-local
+
+      - name: Set up Maven
+        run: sudo apt-get install -y maven
+
+      - name: Build Lambdas
+        run: |
+          cd stack-bytes-lambda
+          mvn clean package shade:shade
+
+      - name: Set up Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      - name: Build and test with Maven
+        run: |
+          cd github-actions-testcontainers
+          mvn clean test
