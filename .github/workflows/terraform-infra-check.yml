@@ -101,10 +101,11 @@ jobs:
       - name: Generate a Diagnostic Report
         if: failure()
         run: |
-          curl -s localhost:4566/_localstack/diagnose > diagnose.json
+          localstack logs > logs.json
+
       - name: Upload the Diagnostic Report
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: diagnose.json
-          path: ./diagnose.json
+          name: logs.json
+          path: ./logs.json
