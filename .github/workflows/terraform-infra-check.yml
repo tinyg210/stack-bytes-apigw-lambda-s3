@@ -26,6 +26,7 @@ jobs:
 
       - name: Set up Maven
         run: sudo apt-get install -y maven
+
       - name: Install LocalStack & awslocal
         run: |
           pip install localstack
@@ -37,11 +38,14 @@ jobs:
           cd stack-bytes-lambda
           mvn clean package shade:shade
 
+      - name: Pull LocalStack image
+        run: |
+          docker pull localstack/localstack-pro:latest
+
       - name: Start LocalStack
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
         run: >
-          docker pull localstack/localstack-pro:latest
           # Start LocalStack in the background
           LS_LOG=trace localstack start -d
           # Wait 20 seconds for the LocalStack container to become ready before timing out
@@ -58,21 +62,17 @@ jobs:
         run: >
           output=$(awslocal s3api list-buckets --query "Buckets[?contains(Name,
           'quotes')].Name" --output text)
-
           if [ -z "$output" ]; then
-
           echo "Created bucket not found."
-
           exit 1
-
           else echo "Bucket with <quotes> name was found: $output"
-
           fi
+
       - name: Check for GET Lambda
         run: >
           getlambda_output=$(awslocal lambda get-function --function-name
           'get-quote')
-          if [ -z "getlambda_output" ]; then
+          if [ -z "$getlambda_output" ]; then
           echo "Lambda function not found."
           exit 1
           else echo "Lambda function was created: $getlambda_output"
@@ -82,7 +82,7 @@ jobs:
         run: >
           postlambda_output=$(awslocal lambda get-function --function-name
           'create-quote')
-          if [ -z "postlambda_output" ]; then
+          if [ -z "$postlambda_output" ]; then
           echo "Lambda function not found."
           exit 1
           else echo "Lambda function was created: $postlambda_output"
@@ -92,7 +92,7 @@ jobs:
         run: >
           apigw_output=$(awslocal apigateway get-rest-apis --query
           "items[?name=='quote-api-gateway']")
-          if [ -z "apigw_output" ]; then
+          if [ -z "$apigw_output" ]; then
           echo "API Gateway function not found."
           exit 1
           else echo "API Gateway was created: $apigw_output"
