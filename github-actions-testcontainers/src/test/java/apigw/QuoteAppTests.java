@@ -37,7 +37,7 @@ public class QuoteAppTests extends LocalStackConfig {
     GetFunctionRequest getFunctionRequest = GetFunctionRequest.builder()
         .functionName("create-quote")
         .build();
-    WaiterResponse<GetFunctionResponse> waiterResponse = waiter.waitUntilFunctionExists(
+    WaiterResponse<GetFunctionResponse> waiterResponse = waiter.waitUntilFunctionActiveV2(
         getFunctionRequest);
     waiterResponse.matched().response().ifPresent(response -> LOGGER.info(response.toString()));
 
