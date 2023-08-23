@@ -45,10 +45,8 @@ jobs:
       - name: Start LocalStack
         env:
           LOCALSTACK_API_KEY: ${{ secrets.LOCALSTACK_API_KEY }}
-        run: >
-          # Start LocalStack in the background
+        run: |
           LS_LOG=trace localstack start -d
-          # Wait 20 seconds for the LocalStack container to become ready before timing out
           echo "Waiting for LocalStack startup..."
           localstack wait -t 20
           echo "Startup complete"
@@ -59,7 +57,7 @@ jobs:
           bash run-terraform.sh
 
       - name: Check for Bucket
-        run: >
+        run: |
           output=$(awslocal s3api list-buckets --query "Buckets[?contains(Name,
           'quotes')].Name" --output text)
           if [ -z "$output" ]; then
@@ -69,7 +67,7 @@ jobs:
           fi
 
       - name: Check for GET Lambda
-        run: >
+        run: |
           getlambda_output=$(awslocal lambda get-function --function-name
           'get-quote')
           if [ -z "$getlambda_output" ]; then
@@ -79,7 +77,7 @@ jobs:
           fi
 
       - name: Check for POST Lambda
-        run: >
+        run: |
           postlambda_output=$(awslocal lambda get-function --function-name
           'create-quote')
           if [ -z "$postlambda_output" ]; then
@@ -89,7 +87,7 @@ jobs:
           fi
 
       - name: Check API Gateway
-        run: >
+        run: |
           apigw_output=$(awslocal apigateway get-rest-apis --query
           "items[?name=='quote-api-gateway']")
           if [ -z "$apigw_output" ]; then
