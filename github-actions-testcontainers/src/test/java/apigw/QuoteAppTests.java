@@ -41,13 +41,6 @@ public class QuoteAppTests extends LocalStackConfig {
         getFunctionRequest);
     waiterResponse.matched().response().ifPresent(response -> LOGGER.info(response.toString()));
 
-//    // wait 5 seconds to make sure the lambda is active
-//    try {
-//      Thread.sleep(5000);
-//
-//    } catch (InterruptedException e) {
-//      e.printStackTrace();
-//    }
   }
 
   @AfterAll
@@ -67,25 +60,21 @@ public class QuoteAppTests extends LocalStackConfig {
             + " \\\"I Like That Boulder. That Is A Nice Boulder.\\\"\\n}\","
             + "\"message\":\"New file has been added.\"}";
 
-    // build the URL with the id as a path variable
-    var getUrl = postUrl + "?author=";
-
-    // set the request headers
     try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
-      // Add headers to a POST request
+      // add headers to a POST request
       var httpPost = new HttpPost(postUrl);
       httpPost.setHeader(new BasicHeader("Content-Type", "application/json"));
-      // Create the JSON request body
+      // create the JSON request body
       var jsonRequestBody = "{\n"
           + "\"author\":\"Donkey\",\n"
           + "\"text\":\"I Like That Boulder. That Is A Nice Boulder.\"\n"
           + "}";
 
-      // Set the request body
+      // set the request body
       var entity = new StringEntity(jsonRequestBody);
       httpPost.setEntity(entity);
-      // Execute the request
+      // execute the request
       try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
         String responseBody = EntityUtils.toString(response.getEntity());
 
@@ -106,18 +95,51 @@ public class QuoteAppTests extends LocalStackConfig {
 
     var expectedResponse = "{\"text\":\"Quote: I Like That Boulder. That Is A Nice Boulder.\"}";
 
-    // set the request headers
     try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
 
-      // Add headers to a POST request
+      // add headers to the GET request
       var httpGet = new HttpGet(getUrl + "Donkey");
       httpGet.setHeader(new BasicHeader("Content-Type", "application/json"));
 
-      // Execute the request
+      // execute the request
       try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
         String responseBody = EntityUtils.toString(response.getEntity());
 
         Assertions.assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        Assertions.assertEquals(expectedResponse, responseBody);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Test
+  @Order(3)
+  void testExceptionIsThrownOnPostWrongJSON() {
+    var postUrl =
+        localStackEndpoint + "/restapis/id12345/dev/_user_request_/quoteApi";
+
+    var expectedResponse =
+        "{\"exception\":\"The following field cannot be empty: author.\",\"message\":\"Exception occurred.\"}";
+
+    try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+
+      // add headers to a POST request
+      var httpPost = new HttpPost(postUrl);
+      httpPost.setHeader(new BasicHeader("Content-Type", "application/json"));
+      // create the JSON request body
+      var jsonRequestBody = "{\n"
+          + "\"text\":\"I Like That Boulder. That Is A Nice Boulder.\"\n"
+          + "}";
+
+      // set the request body
+      var entity = new StringEntity(jsonRequestBody);
+      httpPost.setEntity(entity);
+      // execute the request
+      try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+        String responseBody = EntityUtils.toString(response.getEntity());
+
+        Assertions.assertEquals(HttpStatus.SC_BAD_REQUEST, response.getStatusLine().getStatusCode());
         Assertions.assertEquals(expectedResponse, responseBody);
       }
     } catch (IOException e) {
