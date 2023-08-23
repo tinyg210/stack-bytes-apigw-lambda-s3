@@ -17,6 +17,10 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import software.amazon.awssdk.core.waiters.WaiterResponse;
+import software.amazon.awssdk.services.lambda.model.GetFunctionRequest;
+import software.amazon.awssdk.services.lambda.model.GetFunctionResponse;
+import software.amazon.awssdk.services.lambda.waiters.LambdaWaiter;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class QuoteAppTests extends LocalStackConfig {
@@ -26,14 +30,24 @@ public class QuoteAppTests extends LocalStackConfig {
   @BeforeAll
   public static void setup() {
     setupConfig();
-    localStack.followOutput(logConsumer);
-    // wait 5 seconds to make sure the lambda is active
-    try {
-      Thread.sleep(5000);
 
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
+    localStack.followOutput(logConsumer);
+
+    LambdaWaiter waiter = lambdaClient.waiter();
+    GetFunctionRequest getFunctionRequest = GetFunctionRequest.builder()
+        .functionName("create-quote")
+        .build();
+    WaiterResponse<GetFunctionResponse> waiterResponse = waiter.waitUntilFunctionExists(
+        getFunctionRequest);
+    waiterResponse.matched().response().ifPresent(response -> LOGGER.info(response.toString()));
+
+//    // wait 5 seconds to make sure the lambda is active
+//    try {
+//      Thread.sleep(5000);
+//
+//    } catch (InterruptedException e) {
+//      e.printStackTrace();
+//    }
   }
 
   @AfterAll

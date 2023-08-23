@@ -6,11 +6,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.containers.localstack.LocalStackContainer.Service;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.lambda.LambdaClient;
 
 @Testcontainers
 public class LocalStackConfig {
@@ -28,13 +33,21 @@ public class LocalStackConfig {
           .withEnv("LAMBDA_KEEPALIVE_MS", "10000")
           .waitingFor(Wait.forLogMessage(".*Finished creating resources.*\\n", 1));
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(LocalStackConfig.class);
+  protected static final Logger LOGGER = LoggerFactory.getLogger(LocalStackConfig.class);
   protected static Slf4jLogConsumer logConsumer = new Slf4jLogConsumer(LOGGER);
   protected static URI localStackEndpoint;
+  protected static LambdaClient lambdaClient;
 
   @BeforeAll()
   protected static void setupConfig() {
     localStackEndpoint = localStack.getEndpoint();
+
+    lambdaClient = LambdaClient.builder()
+        .region(Region.of(localStack.getRegion()))
+        .endpointOverride(localStackEndpoint)
+        .credentialsProvider(StaticCredentialsProvider.create(
+            AwsBasicCredentials.create(localStack.getAccessKey(), localStack.getSecretKey())))
+        .build();
   }
 
   protected static void cleanLambdaContainers() {
