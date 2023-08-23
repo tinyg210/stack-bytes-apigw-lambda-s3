@@ -1,5 +1,5 @@
 #!/bin/sh
 
 tflocal init
-tflocla plan
+tflocal plan
 tflocal apply --auto-approve
