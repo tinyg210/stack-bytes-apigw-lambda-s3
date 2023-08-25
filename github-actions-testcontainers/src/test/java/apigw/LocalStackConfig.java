@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.localstack.LocalStackContainer;
-import org.testcontainers.containers.localstack.LocalStackContainer.Service;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
@@ -53,18 +52,13 @@ public class LocalStackConfig {
   protected static void cleanLambdaContainers() {
     try {
       String scriptPath = "src/test/resources/delete_lambda_containers.sh";
-
       // ProcessBuilder to execute the script
       ProcessBuilder processBuilder = new ProcessBuilder(scriptPath);
-
       // redirect the process's output to the java process's output
       processBuilder.inheritIO();
-
       Process process = processBuilder.start();
-
       // wait for the process to complete
       int exitCode = process.waitFor();
-
       // print the exit code for debugging purposes
       System.out.println("Script exited with code: " + exitCode);
     } catch (IOException | InterruptedException e) {
