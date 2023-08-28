@@ -15,8 +15,9 @@ services:
       - LOCALSTACK_HOST=localstack # where services are available from other containers
       - ENFORCE_IAM=0 # enforce IAM policies
       - LAMBDA_DOCKER_NETWORK=ls_network
-
+      - DISABLE_CUSTOM_CORS_APIGATEWAY=1
       - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY}
+      - EXTRA_CORS_ALLOWED_ORIGINS=http://localhost:3000
 
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"

@@ -12,6 +12,8 @@
     <module>stack-bytes-lambda</module>
     <module>stack-bytes-sdk</module>
     <module>github-actions-tests</module>
+    <module>localstack-to-the-max</module>
+    <module>ecs-endpoint-checker</module>
   </modules>
 
   <properties>
