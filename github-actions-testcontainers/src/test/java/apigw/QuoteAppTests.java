@@ -10,7 +10,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -41,11 +40,6 @@ public class QuoteAppTests extends LocalStackConfig {
         getFunctionRequest);
     waiterResponse.matched().response().ifPresent(response -> LOGGER.info(response.toString()));
 
-  }
-
-  @AfterAll
-  public static void cleanUp() {
-    cleanLambdaContainers();
   }
 
   @Test

@@ -2,15 +2,21 @@ package apigw;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.DockerClientFactory;
+import org.testcontainers.containers.Network;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.ResourceReaper;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -18,18 +24,21 @@ import software.amazon.awssdk.services.lambda.LambdaClient;
 
 @Testcontainers
 public class LocalStackConfig {
+  static Network network = Network.newNetwork();
 
   @Container
   protected static LocalStackContainer localStack =
       new LocalStackContainer(DockerImageName.parse("localstack/localstack-pro:latest"))
-          .withEnv("LAMBDA_REMOVE_CONTAINERS", "1")
           .withEnv("LOCALSTACK_API_KEY", System.getenv("LOCALSTACK_API_KEY"))
           .withFileSystemBind("../stack-bytes-lambda/target/apigw-lambda.jar",
               "/etc/localstack/init/ready.d/target/apigw-lambda.jar")
           .withFileSystemBind("src/test/resources/init-resources.sh",
               "/etc/localstack/init/ready.d/init-resources.sh")
           .withEnv("DEBUG", "1")
-          .withEnv("LAMBDA_KEEPALIVE_MS", "10000")
+          .withNetwork(network)
+          .withEnv("LAMBDA_DOCKER_NETWORK", ((Network.NetworkImpl) network).getName())
+          .withNetworkAliases("localstack")
+          .withEnv("LAMBDA_DOCKER_FLAGS", testcontainersLabels())
           .waitingFor(Wait.forLogMessage(".*Finished creating resources.*\\n", 1));
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(LocalStackConfig.class);
@@ -49,21 +58,14 @@ public class LocalStackConfig {
         .build();
   }
 
-  protected static void cleanLambdaContainers() {
-    try {
-      String scriptPath = "src/test/resources/delete_lambda_containers.sh";
-      // ProcessBuilder to execute the script
-      ProcessBuilder processBuilder = new ProcessBuilder(scriptPath);
-      // redirect the process's output to the java process's output
-      processBuilder.inheritIO();
-      Process process = processBuilder.start();
-      // wait for the process to complete
-      int exitCode = process.waitFor();
-      // print the exit code for debugging purposes
-      System.out.println("Script exited with code: " + exitCode);
-    } catch (IOException | InterruptedException e) {
-      e.printStackTrace();
-    }
+  static String testcontainersLabels() {
+    return Stream
+        .of(DockerClientFactory.DEFAULT_LABELS.entrySet().stream(),
+            ResourceReaper.instance().getLabels().entrySet().stream())
+        .flatMap(Function.identity())
+        .map(entry -> String.format("-l %s=%s", entry.getKey(), entry.getValue()))
+        .collect(Collectors.joining(" "));
   }
+
 }
 
